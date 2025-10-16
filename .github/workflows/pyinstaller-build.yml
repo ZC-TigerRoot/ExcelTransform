@@ -1,9 +1,9 @@
-name: Build and Release ExcleTransform.exe
+name: Build and Release ExcelTransform.exe
 
 on:
   push:
     paths:
-      - ExcleTransform.py
+      - ExcelTransform.py
       - requirements.txt
       - .github/workflows/pyinstaller-build.yml
   workflow_dispatch:
@@ -42,15 +42,15 @@ jobs:
       - name: Build EXE with PyInstaller
         shell: pwsh
         run: |
-          pyinstaller --noconfirm --onefile --name ExcleTransform ExcleTransform.py
+          pyinstaller --noconfirm --onefile --name ExcelTransform ExcelTransform.py
 
       - name: Publish to GitHub Releases (tag=latest)
         uses: ncipollo/release-action@v1
         with:
           tag: latest
-          name: "Latest ExcleTransform build"
+          name: "Latest ExcelTransform build"
           body: "Automated build from commit ${{ github.sha }}."
-          artifacts: "dist/ExcleTransform.exe"
+          artifacts: "dist/ExcelTransform.exe"
           artifactContentType: application/vnd.microsoft.portable-executable
           allowUpdates: true
           replacesArtifacts: true
