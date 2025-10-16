@@ -1,0 +1,56 @@
+name: Build and Release ExcleTransform.exe
+
+on:
+  push:
+    paths:
+      - ExcleTransform.py
+      - requirements.txt
+      - .github/workflows/pyinstaller-build.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: "pip"
+          cache-dependency-path: "requirements.txt"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          if (Test-Path requirements.txt) {
+            pip install -r requirements.txt
+            pip install pyinstaller
+            # 确保对 .xls 的支持（xlrd 2.x 不支持 .xls）
+            pip install "xlrd==1.2.0"
+          } else {
+            pip install pyinstaller pandas "xlrd==1.2.0" openpyxl
+          }
+
+      - name: Build EXE with PyInstaller
+        shell: pwsh
+        run: |
+          pyinstaller --noconfirm --onefile --name ExcleTransform ExcleTransform.py
+
+      - name: Publish to GitHub Releases (tag=latest)
+        uses: ncipollo/release-action@v1
+        with:
+          tag: latest
+          name: "Latest ExcleTransform build"
+          body: "Automated build from commit ${{ github.sha }}."
+          artifacts: "dist/ExcleTransform.exe"
+          artifactContentType: application/vnd.microsoft.portable-executable
+          allowUpdates: true
+          replacesArtifacts: true
