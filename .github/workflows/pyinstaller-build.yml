@@ -1,0 +1,45 @@
+name: Build ExcleTransform.exe with PyInstaller
+
+on:
+  push:
+    paths:
+      - 'ExcleTransform.py'
+      - 'requirements.txt'
+      - '.github/workflows/pyinstaller-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if (Test-Path requirements.txt) {
+            pip install -r requirements.txt
+            pip install pyinstaller
+          } else {
+            pip install pyinstaller pandas xlrd openpyxl
+          }
+        shell: pwsh
+
+      - name: Build with PyInstaller
+        run: pyinstaller --noconfirm --onefile --name ExcleTransform ExcleTransform.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ExcleTransform-exe
+          path: dist/ExcleTransform.exe
+          if-no-files-found: error
+          retention-days: 7
