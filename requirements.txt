@@ -5,4 +5,3 @@ pandas>=2.0.0
 openpyxl>=3.1.2      # 用于读取/写入 .xlsx
 xlrd==2.0.1          # 用于读取 .xls（注意 xlrd 新版本已不支持 .xls）
 
-# 其他依赖（标准库 re, pathlib 已内置，无需安装）
